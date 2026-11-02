@@ -44,7 +44,7 @@ A test fails on any `pageerror` or `console.error` (Google Fonts errors are igno
 - `sw.js` serves files cache-first. It has `VERSION = 'dev'`, which `build-pages.js` replaces with a hash of the bundled HTML and the manifest. A new version gets a new cache and the old ones are deleted. The precache list contains only `index.html`, the manifest and the icons, because the deployed `index.html` is already bundled.
 - **Gotcha:** the service worker registers only on `https:` or `localhost`. If you serve the unbundled repo over `localhost`, it caches `src/*.js` under the `dev` version and keeps serving the stale copies. Test with `file://`, or unregister the worker / clear site data.
 - Updates: on `controllerchange` the app reloads by itself if the title screen is showing. Mid-game it only shows a toast, so a park in progress is never reloaded away.
-- Deploy (`.github/workflows/jurassic-tycoon.yml`) pushes `build-pages.js site` to `gh-pages`, but only for pushes to the `jurassic-park-tycoon` branch (not `main`).
+- Deploy (`.github/workflows/jurassic-tycoon.yml`) pushes `build-pages.js site` to `gh-pages`, on pushes to `main` once the tests pass; Pages serves the `gh-pages` branch at https://mszarski.github.io/jurassic-park-tycoon/.
 
 ## Conventions
 
