@@ -15,6 +15,7 @@ Tests are headless Playwright (Chromium) scripts; Node 22. Playwright is not ven
 ```bash
 node tools/ci.js                      # the CI suite: boot every mode, tutorial, InGen calls, blueprints, attractions, campaign, fuzz + save/load, panels
 node tools/rts.js [screenshotDir]     # CI's second step: RTS controls with real mouse events
+node tools/balance.js [--full] [--only text] [--json]   # balance sweep: bots play every scenario/chapter well and badly (CI runs --full, ~90s)
 node tools/smoke.js out.png tools/long.js   # run an in-page script, print its RESULT, screenshot
 node tools/shot.js <url-or-file> <out.png> [w] [h] [waitMs] [evalJs]
 node tools/bundle.js [out]            # single-file page (default dist/jurassic-tycoon.html)
@@ -28,6 +29,8 @@ There are two kinds of files in `tools/`:
 - **In-page scripts** (`fuzz.js`, `tutorial.js`, `long.js`, `campaign.js`, `econ.js`, ...) are bare IIFEs evaluated in the page with `tools/helpers.js` prepended. They use the `T.*` helpers (`T.place`, `T.rect`, `T.path`, `T.run(secs)`, `T.clear`) and the game globals, and they return a value that `ci.js` checks. A new CI test is an entry in the `TESTS` array in `ci.js`.
 
 A test fails on any `pageerror` or `console.error` (Google Fonts errors are ignored), not only on a failed check.
+
+**Balance sweep.** `tools/bots.js` defines `window.B`: park-building helpers (`B.near`, `B.pad`, `B.pen`, `B.starter`, `B.route`, `B.pylons`, `B.powerAll`) and scripted players (`B.play`, `B.manage`, `B.heed` which follows the advisor, `B.scenario`, `B.freePlay`). `tools/balance.js` lists the cases (`CASES`): each runs bots on fixed seeds and states what must hold ("prepared wins >= 3 of 4", "idle loses"). **After any economy, AI or scenario change, run it; if a case fails, decide whether the game or the expectation is wrong, and say which in the commit.** To try a bot by hand: write an in-page script that uses `B` and run it with `smoke.js` after concatenating `tools/bots.js` in front (see how `balance.js` builds `lib`).
 
 ## Architecture
 
@@ -61,7 +64,7 @@ A test fails on any `pageerror` or `console.error` (Google Fonts errors are igno
 - **Wants less busywork** (one-click upkeep, templates, sensible automation), **optional RTS-style control** (things also happen on their own), and **a campaign**.
 - **Every scenario and chapter must stay winnable with sensible play and losable with poor play**, and CI must stay green.
 - **Report format:** a short summary per round: what was wrong, the fix, measured before/after numbers, then that it was pushed and is live in the artifact.
-- **Ship every round:** commit, push `main` (CI tests, then deploys Pages), rebuild the bundle (`node tools/bundle.js`), republish the claude.ai artifact.
+- **Ship every round:** commit, push `main` (CI tests and the balance sweep, then deploys Pages), rebuild the bundle (`node tools/bundle.js`), republish the claude.ai artifact.
 - **CI-green notifications:** just say so briefly.
 - **Commits:** end with the co-author/session trailer lines (see `git log`). Never put model names in commits or code otherwise.
 - **No outward actions** (opening PRs, etc.) unless asked.
@@ -71,7 +74,7 @@ A test fails on any `pageerror` or `console.error` (Google Fonts errors are igno
 
 - Repo: `github.com/mszarski/jurassic-park-tycoon`, all work on `main`.
 - claude.ai artifact (single-file build): https://claude.ai/artifact/FGPyGT92AZStNCUThgALdD. Build `node tools/bundle.js` -> `dist/jurassic-tycoon.html`, publish that file to the same URL.
-- Play harness: earlier sessions drove the game through a scratchpad-only Playwright server (`window.PL` helpers, action-posting script, balance bots); it is not in the repo. `HANDOFF.md` describes it.
+- Play harness: `tools/bots.js` + `tools/balance.js` (see Commands). The earlier scratchpad-only harness described in `HANDOFF.md` is gone; these replace it.
 
 ## Design rules (and why)
 

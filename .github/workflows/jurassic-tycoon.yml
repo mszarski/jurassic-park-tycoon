@@ -22,9 +22,25 @@ jobs:
       - name: RTS controls with the real mouse
         run: node tools/rts.js
 
+  # Bots play every scenario and chapter: sensible play must win, poor play must be able to lose
+  balance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Balance sweep
+        run: node tools/balance.js --full
+
   # Publish the offline-capable web app to the gh-pages branch (served by GitHub Pages)
   deploy:
-    needs: test
+    needs: [test, balance]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
