@@ -300,7 +300,7 @@ const SCENARIOS = {
   storms: {
     name: 'Storm Season',
     blurb: 'Monsoon season. A storm hits every single day, knocking out power and fences. Keep the visitors coming anyway: every dollar guests spend counts, whatever you spend on building.',
-    objective: 'Earn $300,000 from guests (tickets, shops and rides) by Day 12',
+    objective: 'Earn $400,000 from guests (tickets, shops and rides) by Day 12',
     setup(g) {
       g.money = 250000;
       const P = buildStarterPark(g, { staff: true });
@@ -317,10 +317,10 @@ const SCENARIOS = {
     medal(g) { return g.day <= 10 ? 'gold' : g.day <= 11 ? 'silver' : 'bronze'; },
     medalText: 'Gold: by Day 10 · Silver: by Day 11',
     check(g) {
-      if ((g.stats.guestIncome || 0) >= 300000) return 'win';
+      if ((g.stats.guestIncome || 0) >= 400000) return 'win';
       if (g.day > 12) return 'lose';
       return null;
     },
-    progress(g) { return `Earned ${fmtMoney(g.stats.guestIncome || 0)} / $300k · Day ${g.day}/12`; },
+    progress(g) { return `Earned ${fmtMoney(g.stats.guestIncome || 0)} / $400k · Day ${g.day}/12`; },
   },
 };
