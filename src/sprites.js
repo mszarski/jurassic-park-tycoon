@@ -853,6 +853,31 @@ function buildBuildingSprites() {
     p.r(8, 0, 4, 8, '#5a5a5a'); p.r(W - 14, 0, 4, 8, '#5a5a5a');
   });
 
+  make('museum', 20, (p, W, H, ctx) => {
+    // pale stone hall with columns and an amber dome
+    p.box(2, 22, W - 4, H - 24, '#d8d0b8', '#5a5038');
+    p.r(0, 18, W, 5, '#b8ae90'); p.r(0, 18, W, 1, '#f0e8d0');
+    for (let x = 6; x < W - 6; x += 7) { p.r(x, 24, 3, H - 30, '#f0e8d0'); p.r(x + 2, 24, 1, H - 30, '#b8ae90'); }
+    p.r(2, H - 6, W - 4, 2, '#b8ae90'); p.r(0, H - 4, W, 2, '#8a8068');
+    p.r(W / 2 - 4, H - 16, 8, 10, '#3a2814'); p.r(W / 2 - 3, H - 15, 6, 9, '#f8c040');
+    p.r(W / 2 - 10, 6, 20, 12, '#c87818'); p.r(W / 2 - 8, 3, 16, 4, '#e8a028'); p.r(W / 2 - 5, 1, 10, 3, '#f8d060');
+    p.r(W / 2 - 7, 7, 3, 9, '#f8d060'); p.r(W / 2 - 1, 0, 2, 2, '#f8f0c0');
+    drawText3(ctx, 'AMBER', Math.floor(W / 2) - 10, 19, '#5a3a10');
+  });
+
+  make('ferry', 16, (p, W, H, ctx) => {
+    // quay building, a pier and a little white ferry
+    p.r(0, H - 18, W, 18, '#3a6a9a'); p.r(0, H - 18, W, 1, '#7ab0d8');
+    for (let x = 2; x < W; x += 9) p.r(x, H - 12 + (x % 2), 5, 1, '#7ab0d8');
+    p.r(4, H - 24, W - 8, 7, '#8a6a42'); p.r(4, H - 24, W - 8, 1, '#b08a5a');
+    for (let x = 6; x < W - 6; x += 10) p.r(x, H - 18, 2, 8, '#4a3418');
+    p.box(4, 16, 26, H - 40, '#e8e0c8', '#4a4030');
+    windowRow(p, 6, 25, 22, 6, true);
+    roofGable(p, 2, 4, 30, 14, '#1e5a8a', '#2e7ab0', '#123a5a');
+    p.r(30, H - 14, 16, 6, '#f0f0e8'); p.r(32, H - 19, 10, 5, '#f0f0e8'); p.r(33, H - 18, 8, 2, '#3a6a9a'); p.r(30, H - 9, 16, 2, '#c8381e'); p.r(38, H - 24, 3, 5, '#c8381e');
+    drawText3(ctx, 'FERRY', 8, 17, '#123a5a');
+  });
+
   make('shelter', 4, (p, W, H) => {
     // half-buried concrete bunker
     p.r(0, 8, W, H - 8, '#5a6a4a');

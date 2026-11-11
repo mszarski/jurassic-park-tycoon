@@ -542,7 +542,8 @@ class UI {
         if (def.feeds) { const reg = w.regionAt(bx + 1, by) || w.regionAt(bx - 1, by) || w.regionAt(bx, by + 1) || w.regionAt(bx, by - 1); if (reg && reg.public) this.toast('Feeders should go inside a fenced paddock.', 'warn'); }
       } else {
         this.sfx.play('error');
-        if (def.unlockStars && g.stars < def.unlockStars && !g.sandbox) this.toast(`The ${def.name} unlocks at ${def.unlockStars} stars.`, 'warn');
+        if (def.max && g.buildingsOfType(tool).length >= def.max) this.toast(`You can only have ${def.max} ${def.name}s.`, 'warn');
+        else if (def.unlockStars && g.stars < def.unlockStars && !g.sandbox) this.toast(`The ${def.name} unlocks at ${def.unlockStars} stars.`, 'warn');
         else if (!g.canAfford(def.cost)) this.toast(`Not enough money for a ${def.name}.`, 'warn');
         else if (def.unique && g.hasBuilding(tool) && tool !== 'gate') this.toast(`You can only have one ${def.name}.`, 'warn');
         else this.toast(`Can't build there — needs ${def.w}×${def.h} clear land (no water, rock, paths or fences).`, 'warn');
@@ -903,7 +904,11 @@ class UI {
       if (hint && hint.tool) $('#goalBtn').onclick = () => this.showMeTool(hint.tool);
       return;
     }
-    if (g.goalIdx >= GOALS.length) { el.innerHTML = `<b>ALL GOALS COMPLETE</b>Spared no expense. Keep building!`; return; }
+    if (g.goalIdx >= GOALS.length) {
+      const t = legacyTarget(g.legacy);
+      el.innerHTML = `<b>LEGACY ${g.legacy + 1}${g.legacy ? ' · ' + legacyTitle(g.legacy).toUpperCase() : ''}</b>Raise the park score to ${t}: more species, happier animals, landmarks.<br><span style="color:var(--gold)">Score ${Math.floor(g.score || 0)} / ${t} · +${fmtMoney(100000 * (g.legacy + 1))}</span>`;
+      return;
+    }
     const goal = GOALS[g.goalIdx];
     // eggs already in: say so, or the Show me button invites buying a second clutch
     if (goal.id === 'hatch1' && g.eggs.length) {

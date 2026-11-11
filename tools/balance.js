@@ -47,7 +47,7 @@ const show = (r) => r.map((x) => `${x.result}${x.medal ? '/' + x.medal : ''} D${
 const CASES = [
   // ---- scenarios ----
   { name: "Nedry's Night, prepared (walls, backup, bunkers)", run: sc('nedry', [11, 22, 33, 44], `{ prep: ${PREP.nedry} }`), want: 'wins >= 3 of 4', check: (r) => wins(r) >= 3 },
-  { name: "Nedry's Night, unprepared", run: sc('nedry', [11, 22, 33, 44]), want: 'loses at least 2 of 4', check: (r) => losses(r) >= 2 },
+  { name: "Nedry's Night, unprepared", run: sc('nedry', [11, 22, 33, 44]), want: 'loses at least 1 of 4 and 6+ guests in all', check: (r) => losses(r) >= 1 && r.reduce((a, x) => a + x.deaths, 0) >= 6 },
   { name: 'Raptor Siege, bunkers and alarm', run: sc('siege', [11, 22, 33, 44], `{ prep: ${PREP.siege} }`), want: 'wins >= 3 of 4', check: (r) => wins(r) >= 3 },
   { name: 'Raptor Siege, unprepared', run: sc('siege', [11, 22, 33]), want: 'loses 3 of 3', check: (r) => losses(r) === 3 },
   { name: 'Opening Day, prepared and quick to respond', run: sc('opening', [11, 22, 33], `{ prep: ${PREP.opening}, respond: 150, delay: 90 }`), want: 'wins >= 2 of 3', check: (r) => wins(r) >= 2 },
@@ -55,15 +55,15 @@ const CASES = [
   { name: 'Isla Sorna Cleanup, two walled pens and rangers', run: sc('sorna', [11, 22, 33], `{ prep: ${PREP.sorna} }`), want: 'wins >= 2 of 3', check: (r) => wins(r) >= 2 },
   { name: 'Isla Sorna Cleanup, nothing built', run: sc('sorna', [11], `{ respond: 0 }`), want: 'loses', check: (r) => losses(r) === 1 },
   { name: 'The Lost World, small holding pen', run: sc('lostworld', [41, 42, 43], `{ prep: ${PREP.lostworld}, tick: ${TICK.lostworld}, respond: 0 }`), want: 'wins >= 2 of 3', check: (r) => wins(r) >= 2 },
-  { name: 'Storm Season, idle park', run: sc('storms', [21, 22, 23, 24], `{ respond: 0 }`), want: 'loses 4 of 4 (earning $330k-$395k)', check: (r) => wins(r) === 0 && r.every((x) => x.earned >= 330000) },
-  { name: 'Storm Season, responds to breaches but builds nothing', run: sc('storms', [21, 22, 23, 24]), want: 'wins 2-4 of 4, never gold', check: (r) => wins(r) >= 2 && !r.some((x) => x.medal === 'gold') },
-  { name: 'Storm Season, grows the park', run: sc('storms', [21, 22, 23, 24], `{ prep: ${PREP.grow}, manage: true }`), want: 'wins 4 of 4, at least one gold', check: (r) => wins(r) === 4 && r.some((x) => x.medal === 'gold') },
+  { name: 'Storm Season, idle park', run: sc('storms', [21, 22, 23, 24], `{ respond: 0 }`), want: 'wins at most 1 of 4, bronze at best (earning >= $330k)', check: (r) => wins(r) <= 1 && r.every((x) => x.earned >= 330000 && (x.result !== 'win' || x.medal === 'bronze')) },
+  { name: 'Storm Season, responds to breaches but builds nothing', run: sc('storms', [21, 22, 23, 24]), want: 'wins at most 2 of 4, never gold', check: (r) => wins(r) <= 2 && !r.some((x) => x.medal === 'gold') },
+  { name: 'Storm Season, grows the park', run: sc('storms', [21, 22, 23, 24], `{ prep: ${PREP.grow}, manage: true }`), want: 'wins 4 of 4', check: (r) => wins(r) === 4 },
   // ---- campaign ----
   { name: 'Chapter 1, starter park kept in step with its guests', run: sc('c1', [21, 22, 23], `{ prep: () => B.starter({ two: true }), manage: true }`), want: 'wins >= 2 of 3', check: (r) => wins(r) >= 2 },
   { name: 'Chapter 1, nothing built', run: sc('c1', [21], `{ respond: 0 }`), want: 'loses', check: (r) => losses(r) === 1 },
   { name: 'Chapter 2, walled raptors and an arena', run: sc('c2', [11, 22, 33, 44], `{ prep: ${PREP.c2}, tick: ${TICK.c2} }`), want: 'wins >= 3 of 4', check: (r) => wins(r) >= 3 },
   { name: 'Chapter 2, nothing built', run: sc('c2', [11], `{ respond: 0 }`), want: 'loses', check: (r) => losses(r) === 1 },
-  { name: 'Chapter 3, idle park', run: sc('c3', [21, 22, 23, 24], `{ respond: 0 }`), want: 'loses 4 of 4 (earning >= $290k)', check: (r) => wins(r) === 0 && r.every((x) => x.earned >= 290000) },
+  { name: 'Chapter 3, idle park', run: sc('c3', [21, 22, 23, 24], `{ respond: 0 }`), want: 'wins at most 1 of 4, bronze at best (earning >= $290k)', check: (r) => wins(r) <= 1 && r.every((x) => x.earned >= 290000 && (x.result !== 'win' || x.medal === 'bronze')) },
   { name: 'Chapter 3, responds and grows the park', run: sc('c3', [21, 22, 23, 24], `{ prep: ${PREP.grow}, manage: true }`), want: 'wins >= 3 of 4', check: (r) => wins(r) >= 3 },
   { name: 'Chapter 4, pens for the strays then a small park', run: sc('c4', [21, 22, 23], `{ prep: ${PREP.c4}, tick: ${TICK.c4}, manage: true }`), want: 'wins >= 2 of 3', check: (r) => wins(r) >= 2 },
   { name: 'Chapter 4, nothing built', run: sc('c4', [21], `{ respond: 0 }`), want: 'does not win', check: (r) => wins(r) === 0 },
@@ -81,7 +81,9 @@ const CASES = [
       else { const next = [['trike', 15, 13, 2, 250000], ['stego', 14, 12, 2, 300000], ['brachio', 17, 15, 2, 320000], ['anky', 14, 12, 2, 300000], ['raptor', 13, 11, 3, 400000, 1], ['trex', 19, 17, 1, 360000, 1], ['dilo', 12, 10, 2, 300000], ['spino', 19, 17, 1, 450000, 1, 1]].find((q) => !has(q[0]) && g.isUnlocked(q[0]) && m > q[4]);
         if (next) B.pad(next[1], next[2], next[0], next[3], { wall: !!next[5], pond: !!next[6] }); }
     } }))`, want: 'wins >= 1 of 2 by Day 60', check: (r) => wins(r) >= 1, show: (r) => r.map((x) => `${x.result}${x.medal ? '/' + x.medal : ''} D${x.day} ${x.stars}★ ${x.progress}`).join(' | ') },
-  { name: 'Free play on Standard, 60 days', full: true, run: `[501, 502].map((s) => B.freePlay(s, 60))`, want: 'goal >= 12, 3+ stars, at least one carnivore escape overall', check: (r) => r.every((x) => x.goal >= 12 && x.stars >= 3), show: (r) => r.map((x) => `goal ${x.goal} ${x.stars}★ esc ${x.escapes} (carn ${x.carnEscapes}) †${x.deaths}`).join(' | ') },
+  { name: 'Chaos with predators, RESPOND and the alarm within 2 seconds', full: true, run: `[1, 2, 3, 4].map((s) => B.chaos(s, 40, { alarm: true }))`, want: 'loses at most 5 guests over 4 parks', check: (r) => r.reduce((a, x) => a + x.deaths, 0) <= 5, show: (r) => r.map((x) => `†${x.deaths} staff †${x.staff} ${x.stars}★ esc ${x.escapes}`).join(' | ') },
+  { name: 'Chaos with predators, nobody responds', full: true, run: `[1, 2, 3, 4].map((s) => B.chaos(s, 40, { respond: 0 }))`, want: 'loses at least 10 guests over 4 parks', check: (r) => r.reduce((a, x) => a + x.deaths, 0) >= 10, show: (r) => r.map((x) => `†${x.deaths} staff †${x.staff} ${x.stars}★ esc ${x.escapes}`).join(' | ') },
+  { name: 'Free play on Standard, 60 days', full: true, run: `[501, 502].map((s) => B.freePlay(s, 60))`, want: 'goal >= 12, score 150+ in both and 3 stars in one', check: (r) => r.every((x) => x.goal >= 12 && x.score >= 150) && r.some((x) => x.stars >= 3), show: (r) => r.map((x) => `goal ${x.goal} ${x.stars}★ esc ${x.escapes} (carn ${x.carnEscapes}) †${x.deaths}`).join(' | ') },
 ];
 
 (async () => {

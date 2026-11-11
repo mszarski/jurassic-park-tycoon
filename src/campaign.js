@@ -85,7 +85,7 @@ const CHAPTERS = {
     endDay: 26,
     chapter: 3, name: 'Monsoon', size: 'medium', difficulty: 'normal',
     blurb: 'Storm season. A storm rolls in every other day and empties the park. Grow anyway: every dollar guests spend counts, whatever you spend on building.',
-    objective: 'Earn $350,000 from guests (tickets, shops and rides) and keep reputation 50+, by Day 26',
+    objective: 'Earn $375,000 from guests (tickets, shops and rides) and keep reputation 50+, by Day 26',
     setup(g) {
       g.money = 300000;
       const P = buildStarterPark(g, { staff: true });
@@ -100,11 +100,11 @@ const CHAPTERS = {
     },
     tick(g) { if (g.day >= g.scenarioState.lastStorm + 2 && g.hour >= 10) { g.scenarioState.lastStorm = g.day; g.events.trigger('storm'); } },
     check(g) {
-      if ((g.stats.guestIncome || 0) >= 350000 && g.reputation >= 50) return 'win';
+      if ((g.stats.guestIncome || 0) >= 375000 && g.reputation >= 50) return 'win';
       if (g.day > 26) return 'lose';
       return null;
     },
-    progress(g) { return [tick((g.stats.guestIncome || 0) >= 350000, `Earned ${fmtMoney(g.stats.guestIncome || 0)} / $350k`), tick(g.reputation >= 50, `Rep ${Math.round(g.reputation)}/50`), `Day ${g.day}/26`].join(' · '); },
+    progress(g) { return [tick((g.stats.guestIncome || 0) >= 375000, `Earned ${fmtMoney(g.stats.guestIncome || 0)} / $375k`), tick(g.reputation >= 50, `Rep ${Math.round(g.reputation)}/50`), `Day ${g.day}/26`].join(' · '); },
     medal(g) { return g.day <= 24 ? 'gold' : g.day <= 25 ? 'silver' : 'bronze'; },
     medalText: 'Gold: by Day 24 · Silver: by Day 25',
   },

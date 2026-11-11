@@ -139,7 +139,7 @@ class Dino {
       case 'tofeed':
       case 'tofence':
       case 'graze': {
-        const sp = this.state === 'walk' ? this.speed * (this.loose && this.stress > 70 ? 1.3 : 1) : this.speed;
+        const sp = this.state === 'walk' ? this.speed * (this.charging ? 1.55 : this.loose && this.stress > 70 ? 1.3 : 1) : this.speed;
         const done = stepAlong(this, dt, sp, w.dinoPass, w);
         if (done) this.arrive();
         break;
@@ -162,10 +162,13 @@ class Dino {
   decide() {
     const g = this.game, w = g.world;
     const reg = w.regionAt(this.tx, this.ty);
+    this.charging = false;
     // Loose carnivores look for prey
     // raptors on the loose hunt whether or not they are hungry
-    if (this.sp.diet === 'carn' && (this.loose ? (this.sp.clever || this.hunger > 15) : this.hunger > 60)) {
-      const prey = this.findPrey(this.loose ? (this.sp.clever ? 14 : 10) : 30);
+    // on Chaos every loose predator is a man-eater, fed or not
+    const chaos = g.difficulty === 'chaos' && this.loose && this.sp.danger >= 4;
+    if (this.sp.diet === 'carn' && (this.loose ? (this.sp.clever || chaos || this.hunger > 15) : this.hunger > 60)) {
+      const prey = this.findPrey(this.loose ? (this.sp.clever || chaos ? 14 : 10) : 30);
       if (prey) { this.state = 'hunt'; this.target = prey; this.thinkT = 0; return; }
     }
     // Territorial giants fight rivals that share their paddock
@@ -237,14 +240,15 @@ class Dino {
       }
     }
     // Predators on the loose follow the noise: head for the nearest crowd within earshot
-    if (this.loose && this.sp.diet === 'carn' && this.sp.danger >= 4 && this.hunger > 25 && chance(0.6)) {
-      let best = null, bd = 28 * 28;
+    // (on Chaos they hear the screaming from anywhere in the park)
+    if (this.loose && this.sp.diet === 'carn' && this.sp.danger >= 4 && (chaos || (this.hunger > 25 && chance(0.6)))) {
+      let best = null, bd = chaos ? 1e9 : 28 * 28;
       for (const gu of g.guests) { if (gu.hidden) continue; const d = dist2(this.x, this.y, gu.x, gu.y); if (d < bd) { bd = d; best = gu; } }
       if (best) {
         const gx = best.cx, gy = best.cy;
         // stop a few tiles short: from there findPrey takes over and the guests get a chance to run
-        const p = w.bfs(this.tx, this.ty, w.dinoPass, (x, y) => dist2(x, y, gx, gy) < 25, 2500);
-        if (p && p.length) { this.path = p.slice(0, 14); this.pi = 0; this.state = 'walk'; return; }
+        const p = w.bfs(this.tx, this.ty, w.dinoPass, (x, y) => dist2(x, y, gx, gy) < 25, chaos ? 12000 : 2500);
+        if (p && p.length) { this.path = p.slice(0, chaos ? 30 : 14); this.pi = 0; this.state = 'walk'; this.charging = chaos; return; }
       }
     }
     // Herbivores mostly sleep through the night
@@ -388,8 +392,11 @@ class Dino {
     if (this.loose) {
       // the nearest person it can actually get to: a guest on the far side of an intact fence is no prey
       const w = g.world, at = new Map();
+      const crowdOnly = g.difficulty === 'chaos' && this.sp.danger >= 4 && g.guests.some((q) => !q.hidden);
       for (const h of g.humans()) {
         if (h.hidden || h.dead || dist2(this.x, this.y, h.x, h.y) >= bd) continue;
+        // on Chaos staff are no decoy: a predator goes round a ranger to get at the crowd
+        if (crowdOnly && h.kind !== 'guest' && dist2(this.x, this.y, h.x, h.y) > 9) continue;
         at.set(w.idx(Math.floor(h.x), Math.floor(h.y)), h);
       }
       if (at.size) {

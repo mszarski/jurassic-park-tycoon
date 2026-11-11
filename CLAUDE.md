@@ -68,7 +68,6 @@ A test fails on any `pageerror` or `console.error` (Google Fonts errors are igno
 - **CI-green notifications:** just say so briefly.
 - **Commits:** end with the co-author/session trailer lines (see `git log`). Never put model names in commits or code otherwise.
 - **No outward actions** (opening PRs, etc.) unless asked.
-- **Ask before** making Chaos deadlier for a well-prepared park (an open question in `HANDOFF.md`).
 
 ## Pointers
 
@@ -82,6 +81,10 @@ A test fails on any `pageerror` or `console.error` (Google Fonts errors are igno
 - **Star rating:** `score = attraction + reputation * 0.9`; attraction = sum of appeal x comfort + 8 per species + building appeal; `STAR_THRESH` in `game.js`. Reputation drifts nightly toward `avgHappy * 0.55 + safety * 0.45`.
 - **Money goals count `stats.guestIncome`** (tickets + shops), not the bank balance, so building isn't punished. Do-nothing parks may at most barely win money goals; easy idle wins are a bug.
 - **Power-shortage triage:** fences, then staff, then shelters and sirens, then hatchery/restrooms/restaurants/Visitor Center, then lamps, then the rest. Guests starving in the dark was the worst playtest failure.
+- **Chaos predators are man-eaters** (danger 4+, Chaos only): they hunt fed or not, run for the nearest visible guests from anywhere, and ignore staff further than 3 tiles. The crowd path search needs its 12,000-tile budget: at 2,500 predators more than ~25 tiles from guests never arrived, which is why earlier lethality changes did nothing. A 2-second response should still lose almost nobody (balance cases "Chaos with predators").
+- **Shelter doors admit about 3 guests a second** (`door` in `BUILDINGS` overrides), on every difficulty.
+- **Guest limit is `guestCap()`**: 450, plus 150 per powered Ferry Terminal (two at most).
+- **Legacy levels** follow the goal chain in free play: `legacyTarget(n) = 370 + 40n` park score.
 - **Blackouts release carnivores unless there is a Backup Generator.** Calm has no disasters, but grid overload can still release carnivores (a consequence, not a disaster).
 - **Relocation needs a paddock of at least 30% of the species' space** (min 12 tiles). 60% made The Lost World unwinnable; much lower dropped a T. rex into 15-tile scraps.
 - **Lodge Hotel is capped at 40 rooms, enforced both when guests choose and at the door.** Uncapped it paid back in under 4 days and dominated; choose-time-only checks let occupancy hit 127/40.

@@ -71,10 +71,14 @@ class Guest {
       this.viewT = 0.8;
       const threat = g.threatNear(this.x, this.y, 7);
       if ((threat || g.alarm || (g.sirenAlarm && g.inSirenRange(this.x, this.y))) && this.state !== 'flee' && this.state !== 'frozen') {
+        // on Chaos an alarm with nothing in sight is easy to shrug off: people finish their photo first
+        if (!threat && g.difficulty === 'chaos' && !chance(0.3)) { if (chance(0.15)) { this.thought = 'A DRILL?'; this.thoughtT = 1.5; } }
+        else {
         this.goal = null; this.fear = 100;
         // a predator in plain sight: some people freeze before they run (an alarm gives warning, so nobody does)
         if (threat && chance(0.3)) { this.state = 'frozen'; this.frozenT = randf(1, 2.5); this.thought = 'AAAH!'; this.thoughtT = 2; g.soundAt('scream', this.x, this.y, 0.6); }
         else this.state = 'flee';
+        }
       }
       if (this.state !== 'flee') this.lookAtDinos();
       if (this.hunger > 85 || this.toilet > 85) this.happy -= 1.5;
@@ -244,8 +248,12 @@ class Guest {
     }
     if (this.state === 'flee') {
       const b = g.nearShelterWithSpace(this.cx, this.cy);
-      if (b) { b.inside++; this.inBuilding = b; this.state = 'shelter'; this.hidden = true; this.insideT = 6; return; }
-      this.fleeGate = true; return;
+      if (!b) { this.fleeGate = true; return; }
+      // a door lets people through a few at a time: the rest wait outside, in the open
+      const now = g.time * g.secPerHour;
+      if (b.doorAt > now && b.doorAt < now + 5) { if (this.thoughtT <= 0) { this.thought = 'LET US IN!'; this.thoughtT = 1.5; } return; }
+      b.doorAt = Math.max(now, b.doorAt || 0) + 1 / (BUILDINGS[b.type].door || 3);
+      b.inside++; this.inBuilding = b; this.state = 'shelter'; this.hidden = true; this.insideT = 6; return;
     }
     const b = this.goal;
     this.goal = null;

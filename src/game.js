@@ -22,6 +22,10 @@ const GOALS = [
 ];
 
 const STAR_THRESH = [0, 55, 110, 165, 235, 330];
+// after the last goal the park keeps climbing: each Legacy level needs a higher park score
+const LEGACY_TITLES = ['Landmark', 'National Treasure', 'World Wonder', 'Eighth Wonder', 'Living Legend'];
+const legacyTarget = (n) => 370 + 40 * n;
+const legacyTitle = (n) => n <= 0 ? '' : n <= LEGACY_TITLES.length ? LEGACY_TITLES[n - 1] : `${LEGACY_TITLES[LEGACY_TITLES.length - 1]} ${n - LEGACY_TITLES.length + 1}`;
 
 class Game {
   constructor(seed, opts = {}) {
@@ -47,6 +51,7 @@ class Game {
     this.alarm = false; this.sirenAlarm = false;
     this.shake = 0;
     this.goalIdx = 0;
+    this.legacy = 0;
     this.deathLog = []; // days of guest deaths
     this.stats = { guestsTotal: 0, deaths: 0, staffDeaths: 0, escapes: 0, dinoDeaths: 0, fledToday: 0, hatched: 0 };
     this.ledger = this.newLedger();
@@ -435,6 +440,7 @@ class Game {
     const w = this.world, def = BUILDINGS[type];
     if (!w.canPlaceBuilding(type, x, y)) return null;
     if (def.unique && this.hasBuilding(type) && type !== 'gate') { this.log(`You can only have one ${def.name}.`, 'warn'); return null; }
+    if (def.max && this.buildingsOfType(type).length >= def.max) { this.log(`You can only have ${def.max} ${def.name}s.`, 'warn'); return null; }
     if (def.unlockStars && this.stars < def.unlockStars && !this.sandbox) return null;
     for (const d of this.dinos) if (!d.carried && d.tx >= x && d.tx < x + def.w && d.ty >= y && d.ty < y + def.h) return null;
     if (!this.canAfford(def.cost)) { this.log('Not enough money!', 'warn'); return null; }
@@ -1131,6 +1137,7 @@ class Game {
     }
   }
 
+  guestCap() { return 450 + 150 * Math.min(2, this.buildingsOfType('ferry').filter((b) => b.powered).length); }
   desiredGuests() {
     const attractions = this.attraction;
     // Need something to see / do beyond the gate
@@ -1140,7 +1147,7 @@ class Game {
     const repF = 0.4 + this.reputation / 80;
     const night = this.isNight && !this.mod('nightGuests', 0) ? 0.5 : 1;
     const mkt = this.research.has('marketing') ? 1.15 : 1;
-    return Math.min(450, Math.floor((10 + attractions * 2.8) * priceF * repF * night * mkt * this.season.guests * this.mod('guestMul')));
+    return Math.min(this.guestCap(), Math.floor((10 + attractions * 2.8) * priceF * repF * night * mkt * this.season.guests * this.mod('guestMul')));
   }
 
   updateRating() {
@@ -1170,6 +1177,15 @@ class Game {
       this.log(`Goal complete: ${g.text}${g.reward ? ' (+' + fmtMoney(g.reward) + ')' : ''}`, 'goal', null, true);
       this.sound('fanfare');
       if (this.goalIdx >= GOALS.length && !this.victory) { this.victory = true; this.emit('victory'); }
+    }
+    if (!this.scenario && this.goalIdx >= GOALS.length) {
+      while (this.score >= legacyTarget(this.legacy)) {
+        this.legacy++;
+        const reward = 100000 * this.legacy;
+        this.earn(reward, 'grants');
+        this.log(`Legacy level ${this.legacy}: the park is now a ${legacyTitle(this.legacy)}! (+${fmtMoney(reward)})`, 'goal', null, true);
+        this.sound('fanfare');
+      }
     }
   }
 

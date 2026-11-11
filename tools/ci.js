@@ -44,6 +44,7 @@ const TESTS = [
       GAME.eggs.push({ species: 'galli', x: d0.tx, y: d0.ty, t: 5, max: 8 });
       GAME.events.trigger('outage'); GAME.alarm = true; GAME.queueFence(3, 3, F_WALL, 30);
       const outage = GAME.world.power.outage;
+      GAME.legacy = 3;
       const json = serialize(GAME);
       const g = loadGame(json);
       const after = g.dinos.map((d) => [d.name, d.growth.toFixed(3), d.ageDays.toFixed(3), d.loose]).join('|');
@@ -55,6 +56,7 @@ const TESTS = [
       if (g.eggs.length !== 1 || g.eggs[0].t !== 5) out.push('egg lost');
       if (Math.abs(g.world.power.outage - outage) > 0.01) out.push('outage ' + outage + ' -> ' + g.world.power.outage);
       if (!g.alarm) out.push('alarm lost');
+      if (g.legacy !== 3) out.push('legacy level lost');
       if (!g.pendingFences.length) out.push('queued fence lost');
       return out.length ? out : 'ok';
     })()`,

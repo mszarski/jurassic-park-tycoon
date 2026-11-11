@@ -4,6 +4,35 @@
 > References to that repo, its `claude/...` branches, `trajectory_classifier`, the `bd` tracker, or "don't edit
 > CLAUDE.md" are out of date. Where this file and CLAUDE.md disagree, CLAUDE.md wins.
 
+## Update, 2026-11-11 (read this first; it supersedes the sections it names)
+
+The owner asked for three things and all three are shipped on `main`:
+
+1. **Balance sweep in the repo and in CI** (`tools/bots.js`, `tools/balance.js`, CI job `balance`). It replaces
+   the scratchpad harness described in §8 and closes next step 5. 26 cases; `--full` takes about 5 minutes.
+2. **Chaos is deadlier** (the owner said yes; the "ask before" in §6/§7 is answered). On Chaos only:
+   loose predators with danger 4+ hunt whether or not they are fed, run for the nearest visible guests from
+   anywhere on the map, ignore staff more than 3 tiles away, and guests shrug off an alarm for a couple of
+   seconds when nothing is in sight. On every difficulty a shelter door admits about 3 guests a second, so
+   queues form outside.
+   - **Why the earlier attempts did nothing:** the path search toward the crowd stopped after 2,500 tiles, so a
+     predator more than about 25 tiles from guests wandered back to its feeder, and rangers walking up to it
+     were eaten in place of guests. Chaos uses a 12,000-tile budget.
+   - Measured over 4 Chaos parks with dilophosaurs and raptors, 40 days: response within 2 s loses 2 guests in
+     all, a 10 s response 0 to 11 per park, no response 38 in all (was 0 / about 0 / 27).
+   - The bot loses many rangers on Chaos (up to 17 per park). Not looked at yet.
+3. **Late game:** Amber Museum (4 stars, $600k, +22 rating, one per park), Ferry Terminal (5 stars, $900k, two
+   at most, +150 to the 450-guest limit each while powered) and endless Legacy levels after the 16th goal
+   (park score 370, 410, 450, ...; grant $100k x level; `g.legacy`, saved).
+
+Targets moved because idle parks were winning money goals: **Storm Season $430k** (was $300k, then $400k) and
+**Chapter 3 $375k** (was $275k, then $350k). Idle earnings swing $322k to $412k with the seed, so these goals
+separate idle from active play only narrowly: the sweep allows an idle park one bronze win in four. A sturdier
+fix would be a goal that needs growth (guests at once, or species), not a higher number.
+
+Open: late-game buildings are untested by a bot (no case builds a museum or ferry); crowding in parks of
+450+ guests still holds reputation near 45 to 50, and ferries will make that worse unless paths are widened.
+
 Notes for a fresh session picking up this project. Most of the context below came out of a long run of
 "play more" playtesting rounds, not the code, so read this before changing balance or behaviour.
 

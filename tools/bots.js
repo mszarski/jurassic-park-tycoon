@@ -194,9 +194,11 @@ window.B = {
         if (g.looseCount && t0 < 0) t0 = i;
         if (!g.looseCount) t0 = -1;
         if (t0 >= 0 && (i - t0) % respond === (opts.delay || 60)) { g.respondToBreach(); if (opts.alarm !== false && this.dangerLoose()) g.alarm = true; }
-        if (g.alarm && !this.dangerLoose()) g.alarm = false;
+        if (g.alarm && !this.dangerLoose() && !g.events.volcano) g.alarm = false;
         if (opts.repair !== false && i % 300 === 0 && g.countBrokenFences()) g.repairFences();
       }
+      // an attentive player clears the park when the seismic alert sounds
+      if (respond && opts.alarm !== false && g.events.volcano && !g.alarm) g.alarm = true;
       if (opts.manage && i % 300 === 0) this.manage();
       if (opts.tick && i % 75 === 0) opts.tick(g, i);
     }
@@ -266,6 +268,20 @@ window.B = {
     return { id, seed, result: g.scenarioDone || 'unfinished', day: g.day, deaths: g.stats.deaths, staff: g.stats.staffDeaths || 0, escapes: g.stats.escapes, money: Math.round(g.money), rep: Math.round(g.reputation), stars: g.stars, earned: Math.round(g.stats.guestIncome || 0), progress: sc.progress(g).replace(/<[^>]+>/g, ''), medal: g.scenarioDone === 'win' && sc.medal ? sc.medal(g) : null };
   },
   // free play from an empty island, following the goal list the way a new player would
+  // A Chaos park that keeps predators from the first day it can afford them: how many guests does it lose?
+  chaos(seed, days = 40, opts = {}) {
+    startGame({ difficulty: 'chaos', seed, size: 'medium' }); UIX.setSpeed(0);
+    const g = GAME;
+    this.starter({ two: true });
+    let last = -10;
+    const tick = () => {
+      if (g.day <= last + 1 || g.money < 200000) return;
+      const sp = ['dilo', 'raptor', 'trex', 'trike'].find((x) => g.isUnlocked(x) && !g.dinos.some((d) => d.species === x));
+      if (sp) { this.pad(sp === 'trex' ? 18 : 13, sp === 'trex' ? 16 : 12, sp, sp === 'trex' ? 1 : 3); last = g.day; }
+    };
+    this.play(Object.assign({ days, manage: true, tick }, opts));
+    return { seed, day: g.day, stars: g.stars, rep: Math.round(g.reputation), deaths: g.stats.deaths, staff: g.stats.staffDeaths || 0, escapes: g.stats.escapes, money: Math.round(g.money) };
+  },
   freePlay(seed, days, difficulty = 'normal', opts = {}) {
     startGame({ difficulty, seed, size: opts.size || 'medium' }); UIX.setSpeed(0);
     const g = GAME, s = g.start;

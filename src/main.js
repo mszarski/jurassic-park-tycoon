@@ -43,7 +43,7 @@ function serialize(g) {
   const w = g.world;
   return JSON.stringify({
     v: 1, size: g.mapSize, sph: g.secPerHour, lastInc: g.lastIncidentDay, closed: g.parkClosed ? 1 : 0,
-    mods: g.mods || [], contracts: g.contracts || [], freeEgg: g.freeEgg || null, seenDec: g.seenDecisions || {}, nextDec: g.nextDecisionDay || 0, decOn: g.decisionsOn !== false, research: { done: [...g.research.done], active: g.research.active }, breedOff: !!g.breedingOff, seed: g.seed, diff: g.difficulty, scen: g.scenario || null, scenState: g.scenarioState || null, money: g.money, time: g.time, rep: g.reputation, ticket: g.ticket, goalIdx: g.goalIdx, sandbox: !!g.sandbox,
+    mods: g.mods || [], contracts: g.contracts || [], freeEgg: g.freeEgg || null, seenDec: g.seenDecisions || {}, nextDec: g.nextDecisionDay || 0, decOn: g.decisionsOn !== false, research: { done: [...g.research.done], active: g.research.active }, breedOff: !!g.breedingOff, seed: g.seed, diff: g.difficulty, scen: g.scenario || null, scenState: g.scenarioState || null, money: g.money, time: g.time, rep: g.reputation, ticket: g.ticket, goalIdx: g.goalIdx, legacy: g.legacy || 0, sandbox: !!g.sandbox,
     stats: g.stats, history: g.history, deathLog: g.deathLog, auto: g.events.auto, nextDay: g.events.nextDay, start: g.start,
     // anything in flight when the player saved: eggs, crises, queued fences
     eggs: g.eggs.map((e) => ({ s: e.species, x: e.x, y: e.y, t: e.t, max: e.max, un: e.unstable ? 1 : 0 })), pend: g.pendingFences || [],
@@ -86,7 +86,7 @@ function loadGame(json) {
     g.breedingOff = s.breedOff;
     if (d.isPtera) g.pteros.push(d); else g.dinos.push(d);
   }
-  g.money = s.money; g.time = s.time; g.reputation = s.rep; g.ticket = s.ticket; g.goalIdx = s.goalIdx; g.sandbox = s.sandbox;
+  g.money = s.money; g.time = s.time; g.reputation = s.rep; g.ticket = s.ticket; g.goalIdx = s.goalIdx; g.legacy = s.legacy || 0; g.sandbox = s.sandbox;
   g.stats = Object.assign(g.stats, s.stats); g.history = s.history || []; g.deathLog = s.deathLog || [];
   g.events.auto = s.auto; g.events.nextDay = s.nextDay; g.start = s.start;
   g.lastDay = g.day;
