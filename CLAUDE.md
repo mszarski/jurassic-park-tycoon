@@ -55,7 +55,7 @@ A test fails on any `pageerror` or `console.error` (Google Fonts errors are igno
 
 - Commit messages are player-facing sentences about behaviour, often with playtest numbers ("Lodge Hotel rooms $150 a night (at $200 it paid for itself in 4 days)"). Balance changes are backed by scripted playthroughs (`long.js`, `econ.js`, `newbie.js`, ...).
 - User-facing text is plain and actionable: advisor tips say what to build and where. `tutorial.js` rewrites text for touch screens (click→tap, no keyboard hints), so keep its string patterns intact when you edit tutorial text.
-- When you add a tool, keyboard shortcut or mechanic, update the How to Play text in `ui-panels.js` and the controls table in `README.md` too.
+- When you add a tool, keyboard shortcut or mechanic, update the How to Play text in `ui-panels.js` , `docs/playing.md` (its tables come from `data.js`) and the short controls table in `README.md` too.
 
 ## Working with the user
 

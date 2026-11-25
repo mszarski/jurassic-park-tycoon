@@ -1,64 +1,60 @@
-# Jurassic Tycoon — Containment Edition
+# Jurassic Tycoon: Containment Edition
 
-A pixel-art park builder in the spirit of SimCity, set on a dinosaur island where *everything* is trying to go wrong.
+A pixel-art dinosaur park builder that runs in the browser. Fence paddocks, power the fences, hatch
+dinosaurs, bring in the guests, and then deal with storms, sabotage, eruptions and very clever raptors.
 
-Build paddocks, power the electric fences, hatch dinosaurs, lay paths for guests — then survive storms,
-grid sabotage, earthquakes, eruptions, outbreaks and very clever raptors.
+**[Play it now](https://mszarski.github.io/jurassic-park-tycoon/)** in any modern browser, on desktop or
+phone. It installs as an offline app. Or clone the repo and open `index.html`: there is no build step.
 
-## Features
+![A three-star park at midday: paddocks, the main gate and a crowd of guests](docs/img/park.png)
 
-- **Paddocks & power** — electric fences only work inside a power plant's coverage (extend it with pylons). Concrete walls need no power but cost more.
-- **11 species** from Gallimimus to T. rex, plus Pteranodons in an Aviary and an endgame Indominus hybrid that camouflages itself.
-- **Dinosaur needs** — space, tree cover, water, herd size, food, and fear of predators all feed a comfort score. Stressed dinos test the fences; raptors look for the weakest spot; when the grid dies, predators go for the dead fences; and the Indominus schemes against her walls every few days. Plant trees and **dig ponds** to keep them content, and top up an exhibit with **Hatch another** from its paddock panel.
-- **Guests** (each with a name and a hometown) walk paths, eat, shop, stay in the **Lodge Hotel** (40 rooms), ride the **jeep tour** and **gyrospheres**, crowd the **Feeding Grandstand** at feeding time, visit the **Mosasaur Lagoon** and **Raptor Arena**, and flee to shelters when the alarm sounds (shelter doors let only a few through each second, so queues form outside). Narrow paths jam in a panic: lay **wide paths** where the crowds are.
-- **Late game**: the **Amber Museum** landmark, **Ferry Terminals** that raise the 450-guest limit by 150 each, and endless **Legacy levels** after the last goal. On **Chaos Theory** loose predators make straight for the crowd.
-- **Disasters** — tropical storms with lightning (and winds that tear at the Aviary mesh), grid sabotage, earthquakes, volcanic eruptions, outbreaks, rampages, raptor probes, safety inspections. Trigger them yourself from the ☄ menu. When power runs short, fences, staff and shelters stay lit first and a banner says how much more you need.
-- **Response tools** — evacuation alarm, siren towers, rangers with tranquilizer rifles, engineers, ACU helicopter airlifts and strikes, emergency fence repair, backup generators, vet clinics, and closing the park from the Main Gate.
-- **Campaign** — five chapters (Opening Season, Clever Girls, Monsoon, Site B, Jurassic World), each unlocking a perk for the ones after it.
-- **InGen calls** — investors, lawyers, the board and Dr. Wu phone in with deals that pay now and bite later.
-- **RTS controls** — select rangers, engineers and helicopters and give them orders, or hit RESPOND on a breach; everyone also works on their own.
-- **Scenarios** — Nedry's Night, Isla Sorna Cleanup, The Lost World, Opening Day, Raptor Siege and Storm Season: prebuilt crises with objectives and deadlines.
-- **Research Lab** — upgrades (reinforced fences, high-voltage grid, faster darts, ranger training, turbines, medicine, feeders, motion sensors, ACU gunship, marketing) and genome research that unlocks species without stars.
-- **Seasons** — Spring, Summer (tourist peak), Monsoon (storms) and Cool Season; adjustable day length; a Calm mode with no disasters.
-- **Island codes** to share a map, and **medals** for each scenario with your best result saved.
-- Goals (with Show me / How? help), an advisor, a **Park Rating** breakdown (click the rating), finances with a daily net and history graphs, a news ticker, a breach cam, save/load, three difficulty levels, sandbox mode, synthesized sound effects and an original chiptune soundtrack.
+## What is in it
 
-## Play
+- **12 species**, from Gallimimus to T. rex, Pteranodons in an Aviary and an Indominus that hides and schemes.
+  Each needs space, cover, water, a herd and food; unhappy animals test the fences.
+- **A power grid** that the electric fences depend on. A blackout lets the carnivores out.
+- **Guests** with names and hometowns who eat, shop, stay in the hotel, ride jeeps and gyrospheres, and run
+  for the shelters when the alarm sounds.
+- **Breaches you can fight**: rangers with tranquilizer rifles, helicopter airlifts, engineers, sirens,
+  bunkers. Everyone works on their own, or you can give orders RTS-style.
+- **Eight disasters**, on their own schedule or at your command.
+- **A five-chapter campaign** and **six scenarios**, each with medals.
+- **Four difficulties**, from Calm (no disasters) to Chaos Theory (predators run for the crowd).
+- **Research**, seasons, InGen phone calls with deals that bite later, paddock templates, undo, save/load,
+  island codes, sandbox mode, and an original chiptune soundtrack.
+- **A late game**: the Amber Museum, Ferry Terminals and endless Legacy levels.
 
-Open `index.html` in any modern browser. No build step, no dependencies.
+## Documentation
 
-## Controls
+- **[Playing](docs/playing.md)**: how the park works, every species and building with its numbers, what to do
+  in a breach, controls.
+- **[Scenarios and campaign](docs/scenarios.md)**: objectives, medals and perks.
+- **[Development](docs/development.md)**: code layout, tests, the balance sweep, build and deploy.
+
+## Quick controls
 
 | Input | Action |
 | --- | --- |
-| Left click | Use tool / select |
-| Drag | Build lines (paths, fences, walls) and areas (paddock, demolish, trees, ponds) |
-| Right-drag, or drag with Inspect | Pan |
-| Mouse wheel / pinch | Zoom |
-| WASD / arrows | Pan |
+| Click / drag | Use the tool: drag for paths, fences and paddocks |
+| Right-drag, WASD, arrows | Pan |
+| Wheel / pinch | Zoom |
 | Space, 1–4 | Pause / speed |
 | E | Evacuation alarm |
-| O / K | Power / paddock overlays |
-| L | Jump to loose dinosaur |
-| B / M | Respond to a breach / select all rangers |
-| G | Dinosaur roster |
-| U or Ctrl+Z | Undo last construction, demolition or egg |
-| Y | Research |
-| Q P I N J F R V X T C H | Tools: inspect, path, wide path, smart path, tour track, fence, paddock, wall, demolish, trees, clear, hatch |
+| B | Respond to a breach |
+| U or Ctrl+Z | Undo |
+
+The full table is in [Playing](docs/playing.md#controls).
 
 ## Development
 
-All code is plain JavaScript in `src/` loaded by `index.html`:
+Plain JavaScript in `src/`, loaded by `index.html`. Tests are headless Playwright scripts:
 
-- `sprites.js` — pixel art (dinosaurs are hand-drawn character grids, buildings are procedural)
-- `sprites-views.js` — hand-drawn front/back dinosaur views
-- `world.js` — terrain generation, paddock region detection, power grid, pathfinding
-- `entities/` — `dino.js`, `ptera.js`, `guest.js`, `staff.js` (rangers, engineers), `vehicles.js` (tour jeeps, ACU helicopter)
-- `events.js` — disasters
-- `scenarios.js` — scenario setups and win/lose checks
-- `tutorial.js` — guided first session
-- `research.js` — research projects and their effects
-- `game.js` — economy, goals, simulation loop
-- `render.js`, `ui.js` (input, toolbar, HUD), `ui-panels.js` (info panel, dialogs), `audio.js`, `main.js`
+```bash
+npm install --no-save --no-package-lock playwright@1.56.1 && npx playwright install --with-deps chromium
+node tools/ci.js                # the test suite
+node tools/balance.js --full    # bots play every scenario and chapter, well and badly
+```
 
-`tools/` holds headless Playwright tests. `node tools/ci.js` runs the suite that GitHub Actions runs on every push (boot every mode, complete the tutorial, fuzz with save/load round trips, open every panel). `node tools/balance.js --full` is the balance sweep: bots (`tools/bots.js`) play every scenario and campaign chapter with sensible play and with poor play, and it fails if sensible play stops winning or idle play starts to. Other scripts are scripted playthroughs, e.g. `node tools/smoke.js out.png tools/long.js`.
+Every push runs both; `main` deploys to GitHub Pages when they pass. See [Development](docs/development.md).
+
+![Title screen](docs/img/title.png)
